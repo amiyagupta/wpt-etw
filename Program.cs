@@ -85,7 +85,7 @@ namespace wpt_etw
             stopwatch.Start();
             var serializedWinInetEvents = JsonConvert.SerializeObject(WinInetEvents);
             stopwatch.Stop();
-            Console.WriteLine("serializedWinInetEvents length: {0}, serialization duration: {1} ({2} ms)", serializedWinInetEvents.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);
+            //Console.WriteLine("serializedWinInetEvents length: {0}, serialization duration: {1} ({2} ms)", serializedWinInetEvents.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);
             stopwatch.Reset();
 
             // create a real time user mode session
@@ -167,8 +167,7 @@ namespace wpt_etw
                             stopwatch.Stop();
                             if (stopwatch.ElapsedTicks > 0)
                             {
-                                Console.WriteLine("Serialized ETW event into {0} bytes of Json in {1} ticks ({2} ms)", json.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);
-                                //Console.WriteLine("Json: {0}\n", json);
+                                Console.WriteLine("Serialized ETW event into {0} bytes of Json in {1} ticks ({2} ms)", json.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);                                 
                             }
                             stopwatch.Reset();
                             mutex.WaitOne();
