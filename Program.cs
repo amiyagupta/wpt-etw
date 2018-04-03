@@ -63,6 +63,7 @@ namespace wpt_etw
         static string body_dir = "";
         static Dictionary<string, CustomProvider> customProviders = new Dictionary<string, CustomProvider>();
         static string customProvidersConfigPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @".\customProviders.json");
+        static Stopwatch stopwatch = new Stopwatch();
 
         static void Main(string[] args)
         {
@@ -80,8 +81,12 @@ namespace wpt_etw
             }
 
             // perf optimization - warm up the Json serializer to avoid a big perf hit serializing the first event while the test is running
-            // reduces the observer effect of the exe            
-            var serializedWinInetEvents = JsonConvert.SerializeObject(WinInetEvents);            
+            // reduces the observer effect of the exe
+            //stopwatch.Start();
+            //var serializedWinInetEvents = JsonConvert.SerializeObject(WinInetEvents);
+            //stopwatch.Stop();
+            //Console.WriteLine("serializedWinInetEvents length: {0}, serialization duration: {1} ({2} ms)", serializedWinInetEvents.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);
+            //stopwatch.Reset();
 
             // create a real time user mode session
             using (session = new TraceEventSession("wpt-etw"))
@@ -157,7 +162,15 @@ namespace wpt_etw
 
                             //evt["ascii"] = System.Text.Encoding.ASCII.GetString(data.EventData());
                             //evt["raw"] = data.EventData();
+                            stopwatch.Start();
                             string json = JsonConvert.SerializeObject(evt);
+                            stopwatch.Stop();
+                            if (stopwatch.ElapsedTicks > 0)
+                            {
+                                Console.WriteLine("Serialized ETW event into {0} bytes of Json in {1} ticks ({2} ms)", json.Length, stopwatch.ElapsedTicks, stopwatch.ElapsedMilliseconds);
+                                //Console.WriteLine("Json: {0}\n", json);
+                            }
+                            stopwatch.Reset();
                             mutex.WaitOne();
                             events.Append(json).Append("\n");
                             mutex.ReleaseMutex();
